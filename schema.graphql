@@ -22,6 +22,7 @@ type TokenContract @entity {
   symbol: String,
   isLikelyERC1155: Boolean!
   tokens: [Token!]! @derivedFrom(field: "contract")
+  baseURI:String
 }
 
 type Owner @entity {

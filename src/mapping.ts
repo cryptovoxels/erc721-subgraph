@@ -17,7 +17,26 @@ import { normalize } from "./helpers";
 const zeroAddress = "0x0000000000000000000000000000000000000000"
 
 export function handleURI(event: URI): void {
+  let contractId = event.address.toHex();
 
+  let contract = EIP721AndEIP1155.bind(event.address);
+  let tokenContract = TokenContract.load(contractId);
+  if(tokenContract == null) {
+    tokenContract = new TokenContract(contractId)
+    tokenContract.isLikelyERC1155 = false
+    let name = contract.try_name();
+    if(!name.reverted) {
+        tokenContract.name = normalize(name.value);
+    }
+    let symbol = contract.try_symbol();
+    if(!symbol.reverted) {
+        tokenContract.symbol = normalize(symbol.value);
+    }
+    tokenContract.save()
+  }
+
+  tokenContract.baseURI = event.params.value
+  tokenContract.save()
 }
 
 export function handleTransfer(event: Transfer): void {
